@@ -171,9 +171,15 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # This allows your React frontend to talk to the backend
 
 # Determine allowed origins:
-# - If CORS_ORIGINS env var is set (comma-separated), use that
-# - Otherwise, fall back to localhost defaults for development
+# - Always allow local dev + production Vercel URLs below
+# - Merge with CORS_ORIGINS (comma-separated) for extra domains (e.g. preview URLs)
+# - Deduplicate while preserving order
+vercel_cors_origins = [
+    "https://integrated-deal-and-product-system-idps-kpoo.vercel.app",
+    "https://integrated-deal-and-product-system-idps-kpoo-mbs3jh8fk.vercel.app",
+]
 default_cors_origins = [
+    *vercel_cors_origins,
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
@@ -181,10 +187,9 @@ default_cors_origins = [
 ]
 
 cors_env = settings.CORS_ORIGINS.strip() if isinstance(settings.CORS_ORIGINS, str) else ""
-if cors_env:
-    allow_origins = [origin.strip() for origin in cors_env.split(",") if origin.strip()]
-else:
-    allow_origins = default_cors_origins
+env_origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env else []
+merged = default_cors_origins + env_origins
+allow_origins = list(dict.fromkeys(merged))
 
 app.add_middleware(
     CORSMiddleware,

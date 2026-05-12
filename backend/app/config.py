@@ -27,8 +27,9 @@ class Settings(BaseSettings):
     
     # CORS (Cross-Origin Resource Sharing)
     # This allows the React frontend (running on different port) to talk to the backend.
-    # Can be set via CORS_ORIGINS env var as a simple comma-separated string, e.g.:
-    # CORS_ORIGINS="http://localhost:5173,https://your-app.vercel.app"
+    # main.py merges this with built-in localhost + production Vercel URLs.
+    # Can be set via CORS_ORIGINS env var as a comma-separated string, e.g.:
+    # CORS_ORIGINS="https://your-branch-xxx.vercel.app"
     # We keep it as a string here to avoid Pydantic parsing issues, and split it in main.py.
     CORS_ORIGINS: str = ""
     
