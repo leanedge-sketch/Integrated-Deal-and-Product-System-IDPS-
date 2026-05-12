@@ -587,7 +587,7 @@ Use the exact category names as keys (lowercase, underscores for spaces)."""
     try:
         profile_text = gemini_chat(messages)
         if not profile_text or not profile_text.strip():
-            raise RuntimeError("AI service returned empty response. Please check GEMINI_API_KEY configuration.")
+            raise RuntimeError("AI service returned empty response. Please check OPENAI_API_KEY configuration.")
     except Exception as e:
         error_msg = f"Failed to generate AI profile: {str(e)}"
         logging.error(error_msg)
