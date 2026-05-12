@@ -39,12 +39,16 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_KEY: str = ""  # Service key for admin operations
     
     # AI Provider Settings
-    LLM_PROVIDER: str = "gemini"  # Default to Gemini
+    LLM_PROVIDER: str = "openai"
+    OPENAI_API_KEY: str = ""
+    OPENAI_CHAT_MODEL: str = "gpt-4o-mini"
+    OPENAI_EMBED_MODEL: str = "text-embedding-3-small"
+    OPENAI_EMBED_DIM: int = 768  # Match existing pgvector(768) schema
+    # Legacy / fallback keys (unused — kept so older .env files don't break)
     GEMINI_API_KEY: str = ""
     GEMINI_CHAT_MODEL: str = "gemini-2.5-flash"
     GEMINI_EMBED_MODEL: str = "text-embedding-004"
-    GROQ_API_KEY: str = ""  # Fallback AI provider
-    OPENAI_API_KEY: str = ""  # Another fallback option
+    GROQ_API_KEY: str = ""
     
     # Telegram Notifications
     TELEGRAM_BOT_TOKEN: str = ""

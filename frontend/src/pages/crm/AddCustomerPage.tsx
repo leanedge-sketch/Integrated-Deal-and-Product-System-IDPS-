@@ -4,7 +4,6 @@ import { api, Customer, Interaction } from "../../services/api";
 
 interface CustomerFormState {
   customer_name: string;
-  display_id?: string;
 }
 
 export function AddCustomerPage() {
@@ -34,7 +33,6 @@ export function AddCustomerPage() {
 
       const payload: CustomerFormState = {
         customer_name: form.customer_name.trim(),
-        display_id: form.display_id?.trim() || undefined,
       };
 
       const res = await api.post<Customer>("/crm/customers", payload);
@@ -166,24 +164,6 @@ export function AddCustomerPage() {
                   setForm((prev) => ({ ...prev, customer_name: e.target.value }))
                 }
                 placeholder="e.g. Sika Abyssinia Chemicals PLC"
-              />
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="display_id">
-                Display ID{" "}
-                <span className="muted">
-                  (optional – will auto-generate if left blank)
-                </span>
-              </label>
-              <input
-                id="display_id"
-                type="text"
-                value={form.display_id ?? ""}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, display_id: e.target.value }))
-                }
-                placeholder="e.g. LC-2025-CUST-0001"
               />
             </div>
 
