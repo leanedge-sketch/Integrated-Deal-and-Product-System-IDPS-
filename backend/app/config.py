@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     # CORS_ORIGINS="https://your-branch-xxx.vercel.app"
     # We keep it as a string here to avoid Pydantic parsing issues, and split it in main.py.
     CORS_ORIGINS: str = ""
+    # If True, reflect any Origin (testing only). Do not combine with allow_origins=["*"] + credentials.
+    CORS_ALLOW_ALL_ORIGINS: bool = False
     
     # Supabase Configuration
     # These connect us to your Supabase database

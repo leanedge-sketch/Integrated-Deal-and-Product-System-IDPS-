@@ -191,17 +191,30 @@ env_origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env 
 merged = default_cors_origins + env_origins
 allow_origins = list(dict.fromkeys(merged))
 
-app.add_middleware(
-    CORSMiddleware,
+# Any *.vercel.app preview/production URL (cannot use allow_origins=["*"] with allow_credentials=True).
+# Set CORS_ALLOW_ALL_ORIGINS=true only for short-lived debugging (reflects any Origin).
+if settings.CORS_ALLOW_ALL_ORIGINS:
+    allow_origin_regex = ".*"
+else:
+    allow_origin_regex = r"https://.*\.vercel\.app"
+
+cors_kwargs = dict(
     allow_origins=allow_origins,
-    allow_credentials=True,                # Allow cookies/auth
-    allow_methods=["*"],                   # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],                   # Allow all headers
-    expose_headers=["*"],                  # Expose all headers to frontend
+    allow_origin_regex=allow_origin_regex,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
 
+app.add_middleware(CORSMiddleware, **cors_kwargs)
+
 # Debug: Print CORS configuration
-print(f"CORS configured with allowed origins: {allow_origins}")
+print(
+    f"CORS allow_origins: {allow_origins} | "
+    f"allow_origin_regex: {allow_origin_regex!r} | "
+    f"CORS_ALLOW_ALL_ORIGINS={settings.CORS_ALLOW_ALL_ORIGINS}"
+)
 
 # ============================================
 # HEALTH CHECK ENDPOINT
