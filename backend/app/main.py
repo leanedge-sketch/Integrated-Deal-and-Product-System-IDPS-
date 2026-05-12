@@ -8,9 +8,10 @@ Think of it as:
 - Where middleware (like CORS) is configured
 """
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+from app.cors_relaxed import ReflectingWildcardCORSMiddleware
 from contextlib import asynccontextmanager
 import os
 import logging
@@ -168,53 +169,18 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # ============================================
 # CORS MIDDLEWARE
 # ============================================
-# This allows your React frontend to talk to the backend
-
-# Determine allowed origins:
-# - Always allow local dev + production Vercel URLs below
-# - Merge with CORS_ORIGINS (comma-separated) for extra domains (e.g. preview URLs)
-# - Deduplicate while preserving order
-vercel_cors_origins = [
-    "https://integrated-deal-and-product-system-idps-kpoo.vercel.app",
-    "https://integrated-deal-and-product-system-idps-kpoo-mbs3jh8fk.vercel.app",
-]
-default_cors_origins = [
-    *vercel_cors_origins,
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-
-cors_env = settings.CORS_ORIGINS.strip() if isinstance(settings.CORS_ORIGINS, str) else ""
-env_origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env else []
-merged = default_cors_origins + env_origins
-allow_origins = list(dict.fromkeys(merged))
-
-# Any *.vercel.app preview/production URL (cannot use allow_origins=["*"] with allow_credentials=True).
-# Set CORS_ALLOW_ALL_ORIGINS=true only for short-lived debugging (reflects any Origin).
-if settings.CORS_ALLOW_ALL_ORIGINS:
-    allow_origin_regex = ".*"
-else:
-    allow_origin_regex = r"https://.*\.vercel\.app"
-
-cors_kwargs = dict(
-    allow_origins=allow_origins,
-    allow_origin_regex=allow_origin_regex,
+# Wildcard origins + credentials: use ReflectingWildcardCORSMiddleware so the real
+# Origin is echoed (browsers disallow literal * with Access-Control-Allow-Credentials: true).
+app.add_middleware(
+    ReflectingWildcardCORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
 
-app.add_middleware(CORSMiddleware, **cors_kwargs)
-
-# Debug: Print CORS configuration
-print(
-    f"CORS allow_origins: {allow_origins} | "
-    f"allow_origin_regex: {allow_origin_regex!r} | "
-    f"CORS_ALLOW_ALL_ORIGINS={settings.CORS_ALLOW_ALL_ORIGINS}"
-)
+print("CORS: allow_origins=['*'], allow_credentials=True (reflecting wildcard middleware)")
 
 # ============================================
 # HEALTH CHECK ENDPOINT

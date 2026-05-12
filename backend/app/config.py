@@ -25,16 +25,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
     
-    # CORS (Cross-Origin Resource Sharing)
-    # This allows the React frontend (running on different port) to talk to the backend.
-    # main.py merges this with built-in localhost + production Vercel URLs.
-    # Can be set via CORS_ORIGINS env var as a comma-separated string, e.g.:
-    # CORS_ORIGINS="https://your-branch-xxx.vercel.app"
-    # We keep it as a string here to avoid Pydantic parsing issues, and split it in main.py.
-    CORS_ORIGINS: str = ""
-    # If True, reflect any Origin (testing only). Do not combine with allow_origins=["*"] + credentials.
-    CORS_ALLOW_ALL_ORIGINS: bool = False
-    
+    # CORS: configured in main.py (wildcard + credentials via ReflectingWildcardCORSMiddleware).
     # Supabase Configuration
     # These connect us to your Supabase database
     SUPABASE_URL: str = ""
